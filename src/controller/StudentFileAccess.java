@@ -9,9 +9,10 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import model.Evaluation;
 import model.Student;
@@ -70,7 +71,7 @@ public class StudentFileAccess {
 
 
     public void writeToTextFile(String fileName) {
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName))) {
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("fichierEtudiant.txt"))) {
             for (Student student : students) {
                 bufferedWriter.write(student.getName() + ";" + student.getFirstName() + ";");
                 List<Evaluation> evaluations = student.getEvaluations();
@@ -85,7 +86,7 @@ public class StudentFileAccess {
     }
 
     public void writeToBinaryFile(String fileName) {
-        try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(fileName))) {
+        try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream("fichierBinaire.bin"))) {
             for (Student student : students) {
                 dataOutputStream.writeUTF(student.getName());
                 dataOutputStream.writeUTF(student.getFirstName());
@@ -120,11 +121,25 @@ public class StudentFileAccess {
     }
 
     public void writeObject(String fileName) {
-        //TODO
-
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))) {
+            for (Student student : this.students) {
+                out.writeObject(student);
+            }
+            } catch (IOException ex) {
+                ex.printStackTrace ();
+            }
     }
 
-    public void readObject(String fileName) {
-        //TODO
+    public void readObject(String fileName) { //TODO A FINIR CA MARCHE PAS RIP
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))) {
+            Student a = (Student) in.readObject();
+            this.students.add(a);
+
+            System.out.println(a.getName());
+        } catch (IOException ex1) {
+        ex1.printStackTrace ();
+        } catch (ClassNotFoundException ex2) {
+        ex2.printStackTrace ();
+        }
     }
 }
