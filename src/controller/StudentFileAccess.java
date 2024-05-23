@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -86,11 +87,12 @@ public class StudentFileAccess {
     }
 
     public void writeToBinaryFile(String fileName) {
-        try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream("fichierBinaire.bin"))) {
+        try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(fileName))) {
             for (Student student : students) {
                 dataOutputStream.writeUTF(student.getName());
                 dataOutputStream.writeUTF(student.getFirstName());
                 List<Evaluation> evaluations = student.getEvaluations();
+                dataOutputStream.writeInt(evaluations.size()); // Écrit le nombre d'évaluations
                 for (Evaluation evaluation : evaluations) {
                     dataOutputStream.writeInt(evaluation.getCoefficient());
                     dataOutputStream.writeFloat(evaluation.getScore());
@@ -101,6 +103,7 @@ public class StudentFileAccess {
             System.err.println("Error writing to binary file: " + e.getMessage());
         }
     }
+    
 
     public void readFromBinaryFile(String fileName) {
         try (DataInputStream dataInputStream = new DataInputStream(new FileInputStream(fileName))) {
@@ -108,7 +111,8 @@ public class StudentFileAccess {
                 String name = dataInputStream.readUTF();
                 String firstName = dataInputStream.readUTF();
                 Student student = new Student(name, firstName);
-                while (dataInputStream.available() > 0) {
+                int numberOfEvaluations = dataInputStream.readInt(); // Lit le nombre d'évaluations
+                for (int i = 0; i < numberOfEvaluations; i++) {
                     int coefficient = dataInputStream.readInt();
                     float score = dataInputStream.readFloat();
                     student.add(new Evaluation(score, coefficient));
@@ -119,27 +123,30 @@ public class StudentFileAccess {
             System.err.println("Error reading from binary file: " + e.getMessage());
         }
     }
+    
 
     public void writeObject(String fileName) {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))) {
-            for (Student student : this.students) {
+            out.writeInt(students.size());  // Écrire le nombre d'étudiants d'abord
+            for (Student student : students) {
                 out.writeObject(student);
             }
-            } catch (IOException ex) {
-                ex.printStackTrace ();
-            }
-    }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }    
 
-    public void readObject(String fileName) { //TODO A FINIR CA MARCHE PAS RIP
+   public void readObject(String fileName) {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))) {
-            Student a = (Student) in.readObject();
-            this.students.add(a);
-
-            System.out.println(a.getName());
-        } catch (IOException ex1) {
-        ex1.printStackTrace ();
-        } catch (ClassNotFoundException ex2) {
-        ex2.printStackTrace ();
+            int studentCount = in.readInt();
+            for (int i = 0; i < studentCount; i++) {
+                Student a = (Student) in.readObject();
+                this.students.add(a);
+            }
+        } catch (EOFException eof) {
+            // End of file reached
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 }

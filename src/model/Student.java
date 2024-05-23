@@ -1,9 +1,10 @@
 package model;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.Serializable;
 
 // Define a class representing a student
-public class Student {
+public class Student implements Serializable{
 
     // Attributes to store the student's name and first name
     private String name;

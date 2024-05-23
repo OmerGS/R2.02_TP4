@@ -1,8 +1,9 @@
 package model;
 
+import java.io.Serializable;
 
 // Define a class representing an evaluation
-public class Evaluation {
+public class Evaluation implements Serializable{
 
     // Private attributes representing coefficient and score
     private int coefficient; // Coefficient of the evaluation
