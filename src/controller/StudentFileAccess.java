@@ -103,7 +103,6 @@ public class StudentFileAccess {
             System.err.println("Error writing to binary file: " + e.getMessage());
         }
     }
-    
 
     public void readFromBinaryFile(String fileName) {
         try (DataInputStream dataInputStream = new DataInputStream(new FileInputStream(fileName))) {
@@ -111,7 +110,8 @@ public class StudentFileAccess {
                 String name = dataInputStream.readUTF();
                 String firstName = dataInputStream.readUTF();
                 Student student = new Student(name, firstName);
-                int numberOfEvaluations = dataInputStream.readInt(); // Lit le nombre d'évaluations
+                
+                int numberOfEvaluations = dataInputStream.readInt();
                 for (int i = 0; i < numberOfEvaluations; i++) {
                     int coefficient = dataInputStream.readInt();
                     float score = dataInputStream.readFloat();
